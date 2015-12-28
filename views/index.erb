@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+  <head>
+  	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  	<style type="text/css">
+
+  		#title {
+  			font-size: 36px;
+  			font-family: 'Roboto', sans-serif;
+  			height: 50px;
+  			color: white;
+  		}
+
+  		#title > span {
+  			vertical-align: middle;
+  			vertical-align: top;
+				height: 100%;
+  		}
+
+  		/*Stevan Rodic made moonbase*/
+  		.astro {
+  			background: url("images/astro.png");
+  			background-size: cover;
+  			width: 50px;
+  			height: 50px;
+  			display: inline-block;
+  		}
+
+  		#disconnect > div {
+  			width: 50px;
+  			height: 50px;
+  			display: inline-block;
+  			background: white;
+  		}
+
+  		.text-panel {
+  			background: white;
+  			width: 300px;
+  			height: 300px;
+  			overflow-y: auto;
+  			border-bottom: solid 1px lightgrey;
+  		}
+
+  		.input {
+  			width: 300px;
+  			height: 100px;
+  			background: white;
+  		}
+
+  		.input > input {
+  			width: 100%;
+				height: 40px;
+				border: none;
+				background: transparent;
+				border-top: 1px solid grey;
+				padding:5px;
+  			-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				box-sizing: border-box;
+  		}
+
+  		#rocket {
+  			/*Kreativa Studio*/
+  			background: url("images/spacey.png") no-repeat;
+  			background-size: contain;
+  			width: 50px;
+  			height: 50px;
+  			display: inline-block;
+  			
+  		}
+
+  		#send {
+  			float: right;
+  			padding:5px;
+  			-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				box-sizing: border-box;
+  		}
+
+  		#rocket:hover {
+  			width: 56px;
+  			height: 56px;
+  			margin-right: -3px;
+  			margin-top: -3px;
+  		}
+
+  		body {
+  			background-color: #1E2333;
+  			-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				box-sizing: border-box;
+  		}
+  	</style>
+  </head>
+  <body>
+
+      
+  	<h1 id="title"><div class="astro"></div><span>MoonBase</span></h1>
+  		<div id="log-in">
+
+  		</div>
+      <div id="chat-log">
+
+        <div class="text-panel"><div id="receiving"></div></div>
+        <div class="input">
+        	<input type="text" id="message"></br>
+        	<a href="" id="send"><div id="rocket"></div></a>
+      	</div>
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+      // where our WebSockets logic will go later
+      function addMessage(msg) {
+		    $("#receiving").append("<div>" + msg + "</div>");
+		  }
+
+	  var socket, host;
+		host = "ws://localhost:3001";
+
+		function connect() {
+		  try {
+		    socket = new WebSocket(host);
+
+		    addMessage("Socket State: " + socket.readyState);
+
+		    socket.onopen = function() {
+		      addMessage("Socket Status: " + socket.readyState + " (open)");
+		    }
+
+		    socket.onclose = function() {
+		      addMessage("Socket Status: " + socket.readyState + " (closed)");
+		    }
+
+		    socket.onmessage = function(msg) {
+		      addMessage(msg.data);
+		    }
+		  } catch(exception) {
+		    addMessage("Error: " + exception);
+		  }
+		}
+
+		$(function() {
+		  connect();
+		});
+
+		function send() {
+		  var text = $("#message").val();
+		  if (text == '') {
+		    addMessage("Please Enter a Message");
+		    return;
+		  }
+
+		  try {
+		    socket.send(text);
+		    // addMessage("Sent: " + text)
+		  } catch(exception) {
+		    addMessage("Failed To Send")
+		  }
+
+		  $("#message").val('');
+		}
+
+		$('#message').keypress(function(event) {
+		  if (event.keyCode == '13') { send(); }
+		});
+
+		$("#disconnect").click(function() {
+		  socket.close()
+		});
+    </script>
+  </body>
+</html>
